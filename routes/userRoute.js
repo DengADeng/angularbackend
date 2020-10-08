@@ -21,7 +21,7 @@ router.post("/signin", async (req, res) => {
       token: getToken(signinUser)
     })
   }else{
-    res.status(401).send({mgs: "Invalid Email or Password."});
+    res.status(200).send({mgs: "Invalid Email or Password."});
   }
 })
 
@@ -37,7 +37,8 @@ router.post("/register", async (req, res) => {
         _id: newUser.id,
         name: newUser.name,
         email: newUser.email,
-        isAdmin: newUser.isAdmin
+        isAdmin: newUser.isAdmin,
+        token: getToken(newUser)
       });
       res.status(200).send({mgs: "User has created successfully."});
     }else{
@@ -80,14 +81,35 @@ router.get("/user", async (req, res) => {
 
 })
 
-router.get("/user", async (req, res) => {
+router.get("/user/:id", async (req, res) => {
   try{
-    const users = await User.find({});
+    const user = await User.find({
+      _id : req.params.id
+    });
+    if(user){
+      res.send(user);
+    }else{
+      res.status(400).send({ message: 'user not exist'})
+    }
 
-    res.send(users);
   }catch(error){
     res.send({ msg: error.message });
   }
 
+})
+
+router.get("/checkemail/:email", async(req,res) =>{
+  try{
+    const email = await User.findOne({
+      email : req.params.email
+    });
+    if(email){
+      res.send({message: 'email exists'});
+    }else{
+      res.send({message: 'valid email'});
+    }
+  }catch(error){
+    res.send({ msg: error.message });
+  }
 })
 module.exports = router;
