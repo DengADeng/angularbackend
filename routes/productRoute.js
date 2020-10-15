@@ -12,6 +12,17 @@ router.get("/", async (req, res) => {
   res.send(products);
 });
 
+router.get("/product", async(req,res)=> {
+  const productName = "^.*" + req.query['name']+".*$";
+  var reg = new RegExp(productName);
+  const products = await Product.find({ name:reg});
+  if(products){
+    res.send(products)
+  }else if(err){
+    res.send('can not find data');
+  }
+})
+
 router.get("/:id", async (req, res) => {
   const product = await Product.findOne({ _id: req.params.id });
   if (product) {
